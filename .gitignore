@@ -1,0 +1,6 @@
+.opencode/
+target/
+.idea/
+*.iml
+.DS_Store
+*.log

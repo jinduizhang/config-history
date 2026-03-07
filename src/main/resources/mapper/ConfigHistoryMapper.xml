@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.config.mapper.ConfigHistoryMapper">
+
+    <select id="selectHistoryPage" resultType="com.example.config.entity.ConfigHistory">
+        SELECT id, config_id AS configId, version_no AS versionNo, config_value AS configValue,
+               change_type AS changeType, operator, operator_ip AS operatorIp,
+               change_reason AS changeReason, created_at AS createdAt
+        FROM config_history
+        WHERE config_id = #{configId}
+        ORDER BY version_no DESC
+    </select>
+
+    <select id="selectMaxVersionNo" resultType="java.lang.Integer">
+        SELECT COALESCE(MAX(version_no), 0)
+        FROM config_history
+        WHERE config_id = #{configId}
+    </select>
+
+</mapper>

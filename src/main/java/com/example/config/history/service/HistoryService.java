@@ -12,15 +12,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
-/**
- * 通用历史记录服务
- * <p>
- * 提供历史记录的查询、对比和回退功能
- * </p>
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -29,15 +25,6 @@ public class HistoryService {
     private final GenericHistoryMapper genericHistoryMapper;
     private final DiffCalculator diffCalculator;
 
-    /**
-     * 获取实体历史记录列表
-     *
-     * @param entityType 实体类型
-     * @param entityId   实体ID
-     * @param page       页码
-     * @param pageSize   每页数量
-     * @return 分页历史记录
-     */
     public PageResult<HistoryRecord> getHistory(String entityType, Long entityId, Integer page, Integer pageSize) {
         Page<GenericHistory> pageParam = new Page<>(page, pageSize);
         LambdaQueryWrapper<GenericHistory> wrapper = new LambdaQueryWrapper<>();
@@ -55,15 +42,47 @@ public class HistoryService {
         );
     }
 
-    /**
-     * 获取指定历史版本详情
-     *
-     * @param entityType 实体类型
-     * @param entityId   实体ID
-     * @param versionId  历史版本ID
-     * @return 历史版本详情
-     * @throws RuntimeException 版本不存在或与实体不匹配时抛出
-     */
+    public PageResult<HistoryRecord> getHistoryByTimeRange(String entityType, Long entityId, 
+                                                           LocalDateTime startTime, LocalDateTime endTime,
+                                                           String sortBy, String sortOrder,
+                                                           Integer page, Integer pageSize) {
+        Page<GenericHistory> pageParam = new Page<>(page, pageSize);
+        LambdaQueryWrapper<GenericHistory> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(GenericHistory::getEntityType, entityType)
+                .eq(GenericHistory::getEntityId, entityId);
+        
+        if (startTime != null) {
+            wrapper.ge(GenericHistory::getCreatedAt, startTime);
+        }
+        if (endTime != null) {
+            wrapper.le(GenericHistory::getCreatedAt, endTime);
+        }
+        
+        boolean desc = "desc".equalsIgnoreCase(sortOrder);
+        if ("createdAt".equalsIgnoreCase(sortBy) || "time".equalsIgnoreCase(sortBy)) {
+            wrapper.orderBy(true, !desc, GenericHistory::getCreatedAt);
+        } else if ("versionNo".equalsIgnoreCase(sortBy) || "version".equalsIgnoreCase(sortBy)) {
+            wrapper.orderBy(true, !desc, GenericHistory::getVersionNo);
+        } else {
+            wrapper.orderByDesc(GenericHistory::getCreatedAt);
+        }
+        
+        IPage<GenericHistory> result = genericHistoryMapper.selectPage(pageParam, wrapper);
+        
+        return PageResult.of(
+                result.getRecords().stream().map(this::toRecord).toList(),
+                result.getTotal(),
+                (int) result.getCurrent(),
+                (int) result.getSize()
+        );
+    }
+
+    public List<HistoryRecord> getTopNByTime(String entityType, Long entityId, int limit, String sortOrder) {
+        String orderDirection = "asc".equalsIgnoreCase(sortOrder) ? "ASC" : "DESC";
+        List<GenericHistory> histories = genericHistoryMapper.selectTopNByTime(entityType, entityId, limit, orderDirection);
+        return histories.stream().map(this::toRecord).toList();
+    }
+
     public HistoryRecord getVersion(String entityType, Long entityId, Long versionId) {
         GenericHistory history = genericHistoryMapper.selectById(versionId);
         if (history == null || !history.getEntityType().equals(entityType) || !history.getEntityId().equals(entityId)) {
@@ -72,16 +91,14 @@ public class HistoryService {
         return toRecord(history);
     }
 
-    /**
-     * 对比两个历史版本
-     *
-     * @param entityType 实体类型
-     * @param entityId   实体ID
-     * @param versionId1 版本1 ID
-     * @param versionId2 版本2 ID
-     * @return 差异对比结果
-     * @throws RuntimeException 版本不存在或不匹配时抛出
-     */
+    public HistoryRecord getVersionAtTime(String entityType, Long entityId, LocalDateTime targetTime) {
+        GenericHistory history = genericHistoryMapper.selectByVersionAtTime(entityType, entityId, targetTime);
+        if (history == null) {
+            throw new RuntimeException("指定时间点没有历史记录");
+        }
+        return toRecord(history);
+    }
+
     public DiffResult compareVersions(String entityType, Long entityId, Long versionId1, Long versionId2) {
         GenericHistory v1 = genericHistoryMapper.selectById(versionId1);
         GenericHistory v2 = genericHistoryMapper.selectById(versionId2);
@@ -104,16 +121,6 @@ public class HistoryService {
                 .build();
     }
 
-    /**
-     * 回退到指定版本
-     *
-     * @param entityType 实体类型
-     * @param entityId   实体ID
-     * @param versionId  目标版本ID
-     * @param operator   操作人
-     * @param reason     回退原因
-     * @throws RuntimeException 目标版本不存在时抛出
-     */
     public void rollback(String entityType, Long entityId, Long versionId, String operator, String reason) {
         GenericHistory targetVersion = genericHistoryMapper.selectById(versionId);
         if (targetVersion == null || !targetVersion.getEntityType().equals(entityType) 
@@ -124,12 +131,16 @@ public class HistoryService {
         log.info("Rollback {}:{} to version {}, operator: {}", entityType, entityId, targetVersion.getVersionNo(), operator);
     }
 
-    /**
-     * 将实体转换为DTO
-     *
-     * @param history 历史记录实体
-     * @return 历史记录DTO
-     */
+    public void rollbackToTime(String entityType, Long entityId, LocalDateTime targetTime, String operator, String reason) {
+        GenericHistory targetVersion = genericHistoryMapper.selectByVersionAtTime(entityType, entityId, targetTime);
+        if (targetVersion == null) {
+            throw new RuntimeException("指定时间点没有历史记录");
+        }
+        
+        log.info("Rollback {}:{} to time {} (version {}), operator: {}", 
+                entityType, entityId, targetTime, targetVersion.getVersionNo(), operator);
+    }
+
     private HistoryRecord toRecord(GenericHistory history) {
         HistoryRecord record = new HistoryRecord();
         record.setId(history.getId());

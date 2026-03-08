@@ -99,8 +99,9 @@ src/main/java/com/example/config/
 ├── ConfigHistoryApplication.java    # 启动类
 ├── common/                          # 公共组件
 ├── controller/                      # REST控制器
-├── history/                         # 通用历史记录模块
+├── history/                         # 通用历史记录模块 (独立模块)
 │   ├── aspect/                      # AOP切面
+│   ├── common/                      # 模块内部公共类
 │   ├── controller/                  # 历史记录控制器
 │   ├── dto/                         # 数据传输对象
 │   ├── entity/                      # 实体类
@@ -108,6 +109,15 @@ src/main/java/com/example/config/
 │   └── service/                     # 业务逻辑
 ├── mapper/                          # 数据访问
 └── service/                         # 业务逻辑
+
+## 模块独立说明
+
+history 模块是完全独立的，不依赖 history 包外的其他类：
+
+- `history/common/PageResult.java` - 独立的分页结果类
+- `history/common/Result.java` - 独立的统一响应类
+
+可以将 `history` 包直接复制到其他项目中使用。
 ├── entity/                         # 实体类
 ├── dto/                            # 数据传输对象
 └── common/                         # 公共类

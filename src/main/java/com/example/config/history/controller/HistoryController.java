@@ -1,7 +1,7 @@
 package com.example.config.history.controller;
 
-import com.example.config.common.PageResult;
-import com.example.config.common.Result;
+import com.example.config.history.common.PageResult;
+import com.example.config.history.common.Result;
 import com.example.config.history.dto.DiffResult;
 import com.example.config.history.dto.HistoryRecord;
 import com.example.config.history.service.HistoryService;

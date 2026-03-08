@@ -4,7 +4,7 @@ import com.example.config.history.dto.DiffResult;
 import com.example.config.history.dto.HistoryRecord;
 import com.example.config.history.entity.GenericHistory;
 import com.example.config.history.mapper.GenericHistoryMapper;
-import com.example.config.common.PageResult;
+import com.example.config.history.common.PageResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -3,7 +3,7 @@ package com.example.config.history.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.example.config.common.PageResult;
+import com.example.config.history.common.PageResult;
 import com.example.config.history.dto.DiffResult;
 import com.example.config.history.dto.HistoryRecord;
 import com.example.config.history.entity.GenericHistory;

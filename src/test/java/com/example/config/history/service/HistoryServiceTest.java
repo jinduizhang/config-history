@@ -5,6 +5,7 @@ import com.example.config.history.dto.HistoryRecord;
 import com.example.config.history.entity.GenericHistory;
 import com.example.config.history.mapper.GenericHistoryMapper;
 import com.example.config.history.common.PageResult;
+import com.example.config.history.exception.HistoryException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -151,7 +152,7 @@ class HistoryServiceTest {
         when(genericHistoryMapper.selectById(VERSION_ID)).thenReturn(null);
 
         // When & Then
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        HistoryException exception = assertThrows(HistoryException.class, () -> {
             historyService.getVersion(ENTITY_TYPE, ENTITY_ID, VERSION_ID);
         });
         assertEquals("历史版本不存在", exception.getMessage());
@@ -165,7 +166,7 @@ class HistoryServiceTest {
         when(genericHistoryMapper.selectById(VERSION_ID)).thenReturn(mockHistory);
 
         // When & Then
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        HistoryException exception = assertThrows(HistoryException.class, () -> {
             historyService.getVersion(ENTITY_TYPE, ENTITY_ID, VERSION_ID);
         });
         assertEquals("历史版本不存在", exception.getMessage());
@@ -179,7 +180,7 @@ class HistoryServiceTest {
         when(genericHistoryMapper.selectById(VERSION_ID)).thenReturn(mockHistory);
 
         // When & Then
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        HistoryException exception = assertThrows(HistoryException.class, () -> {
             historyService.getVersion(ENTITY_TYPE, ENTITY_ID, VERSION_ID);
         });
         assertEquals("历史版本不存在", exception.getMessage());
@@ -262,7 +263,7 @@ class HistoryServiceTest {
         when(genericHistoryMapper.selectById(2L)).thenReturn(mockHistory);
 
         // When & Then
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        HistoryException exception = assertThrows(HistoryException.class, () -> {
             historyService.compareVersions(ENTITY_TYPE, ENTITY_ID, 1L, 2L);
         });
         assertEquals("历史版本不存在", exception.getMessage());
@@ -276,7 +277,7 @@ class HistoryServiceTest {
         when(genericHistoryMapper.selectById(2L)).thenReturn(null);
 
         // When & Then
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        HistoryException exception = assertThrows(HistoryException.class, () -> {
             historyService.compareVersions(ENTITY_TYPE, ENTITY_ID, 1L, 2L);
         });
         assertEquals("历史版本不存在", exception.getMessage());
@@ -304,7 +305,7 @@ class HistoryServiceTest {
         when(genericHistoryMapper.selectById(2L)).thenReturn(v2);
 
         // When & Then
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        HistoryException exception = assertThrows(HistoryException.class, () -> {
             historyService.compareVersions(ENTITY_TYPE, ENTITY_ID, 1L, 2L);
         });
         assertEquals("版本与实体不匹配", exception.getMessage());
@@ -377,7 +378,7 @@ class HistoryServiceTest {
         when(genericHistoryMapper.selectById(VERSION_ID)).thenReturn(null);
 
         // When & Then
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        HistoryException exception = assertThrows(HistoryException.class, () -> {
             historyService.rollback(ENTITY_TYPE, ENTITY_ID, VERSION_ID, "admin", "回退");
         });
         assertEquals("目标版本不存在", exception.getMessage());
@@ -391,7 +392,7 @@ class HistoryServiceTest {
         when(genericHistoryMapper.selectById(VERSION_ID)).thenReturn(mockHistory);
 
         // When & Then
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        HistoryException exception = assertThrows(HistoryException.class, () -> {
             historyService.rollback(ENTITY_TYPE, ENTITY_ID, VERSION_ID, "admin", "回退");
         });
         assertEquals("目标版本不存在", exception.getMessage());
@@ -405,7 +406,7 @@ class HistoryServiceTest {
         when(genericHistoryMapper.selectById(VERSION_ID)).thenReturn(mockHistory);
 
         // When & Then
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        HistoryException exception = assertThrows(HistoryException.class, () -> {
             historyService.rollback(ENTITY_TYPE, ENTITY_ID, VERSION_ID, "admin", "回退");
         });
         assertEquals("目标版本不存在", exception.getMessage());
@@ -635,7 +636,7 @@ class HistoryServiceTest {
                 .thenReturn(null);
 
         // When & Then
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        HistoryException exception = assertThrows(HistoryException.class, () -> {
             historyService.getVersionAtTime(ENTITY_TYPE, ENTITY_ID, targetTime);
         });
         assertEquals("指定时间点没有历史记录", exception.getMessage());
@@ -667,7 +668,7 @@ class HistoryServiceTest {
                 .thenReturn(null);
 
         // When & Then
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        HistoryException exception = assertThrows(HistoryException.class, () -> {
             historyService.rollbackToTime(ENTITY_TYPE, ENTITY_ID, targetTime, "admin", "回退");
         });
         assertEquals("指定时间点没有历史记录", exception.getMessage());

@@ -8,6 +8,7 @@ import com.example.config.history.dto.DiffResult;
 import com.example.config.history.dto.HistoryRecord;
 import com.example.config.history.entity.GenericHistory;
 import com.example.config.history.mapper.GenericHistoryMapper;
+import com.example.config.history.exception.HistoryException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -86,7 +87,7 @@ public class HistoryService {
     public HistoryRecord getVersion(String entityType, Long entityId, Long versionId) {
         GenericHistory history = genericHistoryMapper.selectById(versionId);
         if (history == null || !history.getEntityType().equals(entityType) || !history.getEntityId().equals(entityId)) {
-            throw new RuntimeException("历史版本不存在");
+            throw new HistoryException("历史版本不存在");
         }
         return toRecord(history);
     }
@@ -94,7 +95,7 @@ public class HistoryService {
     public HistoryRecord getVersionAtTime(String entityType, Long entityId, LocalDateTime targetTime) {
         GenericHistory history = genericHistoryMapper.selectByVersionAtTime(entityType, entityId, targetTime);
         if (history == null) {
-            throw new RuntimeException("指定时间点没有历史记录");
+            throw new HistoryException("指定时间点没有历史记录");
         }
         return toRecord(history);
     }
@@ -104,12 +105,12 @@ public class HistoryService {
         GenericHistory v2 = genericHistoryMapper.selectById(versionId2);
         
         if (v1 == null || v2 == null) {
-            throw new RuntimeException("历史版本不存在");
+            throw new HistoryException("历史版本不存在");
         }
         
         if (!v1.getEntityType().equals(entityType) || !v1.getEntityId().equals(entityId) ||
             !v2.getEntityType().equals(entityType) || !v2.getEntityId().equals(entityId)) {
-            throw new RuntimeException("版本与实体不匹配");
+            throw new HistoryException("版本与实体不匹配");
         }
         
         return DiffResult.builder()
@@ -125,7 +126,7 @@ public class HistoryService {
         GenericHistory targetVersion = genericHistoryMapper.selectById(versionId);
         if (targetVersion == null || !targetVersion.getEntityType().equals(entityType) 
                 || !targetVersion.getEntityId().equals(entityId)) {
-            throw new RuntimeException("目标版本不存在");
+            throw new HistoryException("目标版本不存在");
         }
         
         log.info("Rollback {}:{} to version {}, operator: {}", entityType, entityId, targetVersion.getVersionNo(), operator);
@@ -134,7 +135,7 @@ public class HistoryService {
     public void rollbackToTime(String entityType, Long entityId, LocalDateTime targetTime, String operator, String reason) {
         GenericHistory targetVersion = genericHistoryMapper.selectByVersionAtTime(entityType, entityId, targetTime);
         if (targetVersion == null) {
-            throw new RuntimeException("指定时间点没有历史记录");
+            throw new HistoryException("指定时间点没有历史记录");
         }
         
         log.info("Rollback {}:{} to time {} (version {}), operator: {}", 

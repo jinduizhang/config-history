@@ -14,6 +14,12 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * 通用历史记录控制器
+ * <p>
+ * 提供任意实体类型的历史记录查询、对比和回退功能
+ * </p>
+ */
 @RestController
 @RequestMapping("/api/v1/history")
 @RequiredArgsConstructor

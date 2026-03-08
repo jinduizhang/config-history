@@ -14,6 +14,12 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 历史记录AOP切面
+ * <p>
+ * 自动拦截Service层方法，记录实体变更历史
+ * </p>
+ */
 @Slf4j
 @Aspect
 @Component

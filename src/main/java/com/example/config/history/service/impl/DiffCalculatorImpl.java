@@ -9,6 +9,12 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 差异计算器实现
+ * <p>
+ * 通过比较两个JSON快照，计算字段级别的差异
+ * </p>
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

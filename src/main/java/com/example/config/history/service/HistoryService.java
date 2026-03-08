@@ -18,6 +18,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * 通用历史记录服务
+ * <p>
+ * 提供历史记录的查询、对比和回退功能
+ * </p>
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

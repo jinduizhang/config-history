@@ -14,6 +14,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 历史记录器实现
+ * <p>
+ * 负责记录实体的变更历史到数据库
+ * </p>
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

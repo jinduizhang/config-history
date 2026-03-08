@@ -229,6 +229,164 @@ curl -s "http://localhost:8080/api/v1/history/..."
 
 ---
 
-**文档版本：** v1.0  
-**更新时间：** 2026-03-08  
+## 八、阶段五：代码质量提升
+
+### 8.1 任务背景
+
+在完成模块独立化和异常处理后，对 history 模块进行全面检查，发现以下问题：
+- 部分文件缺少 JavaDoc 注释
+- 部分服务类缺少单元测试覆盖
+
+### 8.2 执行计划
+
+```
+检查分析 → 制定计划 → 补充JavaDoc → 补充测试 → 验证提交
+```
+
+### 8.3 任务清单
+
+#### 8.3.1 补充 JavaDoc 注释（13个文件）
+
+| 类型 | 文件 | 状态 |
+|------|------|------|
+| 注解 | `HistoryField.java`, `HistoryTrack.java` | ✅ |
+| 公共类 | `PageResult.java`, `Result.java` | ✅ |
+| DTO | `DiffResult.java`, `HistoryRecord.java` | ✅ |
+| 异常 | `HistoryException.java`, `HistoryExceptionHandler.java` | ✅ |
+| 控制器 | `HistoryController.java` | ✅ |
+| 服务 | `HistoryService.java`, `HistoryAspect.java`, `DiffCalculatorImpl.java`, `HistoryRecorderImpl.java` | ✅ |
+
+**JavaDoc 规范示例：**
+
+```java
+/**
+ * 历史记录字段注解
+ * <p>
+ * 标注在实体字段上，用于控制历史记录的行为
+ * </p>
+ */
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface HistoryField {
+    
+    /**
+     * 字段显示名称
+     *
+     * @return 显示名称，用于前端展示
+     */
+    String displayName() default "";
+    
+    /**
+     * 是否忽略该字段
+     *
+     * @return true-忽略，false-记录（默认）
+     */
+    boolean ignore() default false;
+}
+```
+
+#### 8.3.2 补充单元测试（2个测试类）
+
+| 测试类 | 测试场景数 | 状态 |
+|--------|------------|------|
+| `HistoryRecorderTest.java` | 6个测试用例 | ✅ |
+| `HistoryAspectTest.java` | 4个测试用例 | ✅ |
+
+**HistoryRecorderTest 测试场景：**
+
+| 测试方法 | 测试场景 |
+|----------|----------|
+| `recordCreate_success` | 记录创建操作 - 正常场景 |
+| `recordUpdate_success` | 记录更新操作 - 正常场景 |
+| `recordDelete_success` | 记录删除操作 - 正常场景 |
+| `recordRollback_success` | 记录回退操作 - 正常场景 |
+| `recordCreate_versionIncrement` | 版本号递增验证 |
+| `recordCreate_noAnnotation` | 无注解实体不记录 |
+
+**HistoryAspectTest 测试场景：**
+
+| 测试方法 | 测试场景 |
+|----------|----------|
+| `recordCreate_withAnnotatedEntity` | 创建操作 - 带注解实体 |
+| `recordCreate_withoutAnnotation` | 创建操作 - 无注解实体 |
+| `recordUpdate_withAnnotatedEntity` | 更新操作 - 带注解实体 |
+| `recordDelete_success` | 删除操作 - 正常场景 |
+
+### 8.4 遇到的问题与解决
+
+#### 问题1：Mockito `insert` 方法歧义
+
+**问题描述：**
+```java
+when(genericHistoryMapper.insert(any(GenericHistory.class))).thenReturn(1);
+// 编译错误：The method insert(GenericHistory) is ambiguous
+```
+
+**解决方案：**
+使用 `doReturn` 替代 `when`：
+```java
+doReturn(1).when(genericHistoryMapper).insert(any(GenericHistory.class));
+```
+
+#### 问题2：UnnecessaryStubbingException
+
+**问题描述：**
+Mockito 严格模式下，未使用的 stub 会抛出异常。
+
+**解决方案：**
+使用 `lenient()` 放宽限制：
+```java
+lenient().when(joinPoint.getSignature()).thenReturn(methodSignature);
+```
+
+### 8.5 最终测试覆盖
+
+| 服务类 | 测试类 | 测试用例数 | 状态 |
+|--------|--------|------------|------|
+| HistoryService | HistoryServiceTest | 33 | ✅ |
+| SnapshotService | SnapshotServiceTest | - | ✅ |
+| DiffCalculator | DiffCalculatorTest | - | ✅ |
+| HistoryRecorder | HistoryRecorderTest | 6 | ✅ |
+| HistoryAspect | HistoryAspectTest | 4 | ✅ |
+| HistoryController | HistoryControllerTest | - | ✅ |
+
+### 8.6 变更统计
+
+| 项目 | 数量 |
+|------|------|
+| 新增 JavaDoc 文件 | 13 |
+| 新增测试文件 | 2 |
+| 修复测试文件 | 1 |
+| 新增代码行数 | 514 |
+
+---
+
+## 九、完整开发历程总结
+
+```
+阶段一：基础功能开发
+    ↓
+阶段二：时间维度功能扩展
+    ↓
+阶段三：模块独立化重构
+    ↓
+阶段四：异常处理优化
+    ↓
+阶段五：代码质量提升（JavaDoc + 单元测试）
+```
+
+### 关键里程碑
+
+| 阶段 | 主要成果 | 提交记录 |
+|------|----------|----------|
+| 阶段一 | 基础 CRUD + 历史记录 | 初始提交 |
+| 阶段二 | 时间维度查询功能 | `feat: 新增历史记录时间相关查询和回退功能` |
+| 阶段三 | 模块独立化 | `refactor: history模块独立化，不依赖外部包` |
+| 阶段四 | 友好异常处理 | `fix: history模块独立异常处理，返回友好错误信息` |
+| 阶段五 | 代码质量提升 | `docs: 补充history模块JavaDoc注释和单元测试` |
+
+---
+
+**文档版本：** v2.0  
+**更新时间：** 2026-03-09  
 **技术栈：** Spring Boot 3.2.0 + MyBatis-Plus 3.5.5 + Java 21

@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS generic_history (
     entity_type     VARCHAR(100) NOT NULL,
     entity_id       BIGINT NOT NULL,
     version_no      INT NOT NULL,
-    snapshot        CLOB NOT NULL,
+    snapshot        TEXT NOT NULL,
     change_type     VARCHAR(20) NOT NULL,
     change_fields   VARCHAR(500),
     operator        VARCHAR(100),

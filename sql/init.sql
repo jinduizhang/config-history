@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS generic_history (
     entity_type     VARCHAR(100) NOT NULL COMMENT '实体类型',
     entity_id       BIGINT NOT NULL COMMENT '实体ID',
     version_no      INT NOT NULL COMMENT '版本号',
-    snapshot        JSON NOT NULL COMMENT '实体快照',
+    snapshot        TEXT NOT NULL COMMENT '实体快照',
     change_type     VARCHAR(20) NOT NULL COMMENT '变更类型：CREATE-创建，UPDATE-更新，DELETE-删除',
     change_fields   VARCHAR(500) COMMENT '变更字段列表，逗号分隔',
     operator        VARCHAR(100) COMMENT '操作人',

@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS generic_history (
     entity_type     VARCHAR(100) NOT NULL COMMENT '实体类型，如 ConfigItem, Order, User 等',
     entity_id       BIGINT NOT NULL COMMENT '实体ID',
     version_no      INT NOT NULL COMMENT '版本号，同一实体从1开始递增',
-    snapshot        JSON NOT NULL COMMENT '实体快照，JSON格式存储完整实体数据',
+    snapshot        TEXT NOT NULL COMMENT '实体快照，JSON格式存储完整实体数据',
     change_type     VARCHAR(20) NOT NULL COMMENT '变更类型：CREATE-创建，UPDATE-更新，DELETE-删除',
     change_fields   VARCHAR(500) COMMENT '变更字段列表，多个字段逗号分隔',
     operator        VARCHAR(100) COMMENT '操作人',
@@ -51,6 +51,10 @@ CREATE TABLE IF NOT EXISTS generic_history (
 -- 5. 变更字段：
 --    change_fields 记录本次变更涉及的字段
 --    示例：name,value
+--
+-- 6. 快照存储说明：
+--    snapshot 使用 TEXT 类型存储大型 JSON 数据
+--    可存储超过 64KB 的实体快照
 --
 -- =====================================================
 -- 示例数据

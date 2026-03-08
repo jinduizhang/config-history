@@ -1,0 +1,81 @@
+### 配置历史管理模块接口测试
+
+@baseUrl = http://localhost:8080/api/v1/configs
+
+### 1. 获取配置列表
+GET {{baseUrl}}?page=1&pageSize=10
+
+### 2. 获取配置列表（带关键字搜索）
+GET {{baseUrl}}?page=1&pageSize=10&keyword=app
+
+### 3. 新增配置
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "configKey": "system.timeout",
+  "configName": "系统超时配置",
+  "configValue": "{\"connectTimeout\": 5000, \"readTimeout\": 10000}",
+  "description": "系统连接和读取超时配置",
+  "operator": "admin"
+}
+
+### 4. 获取配置详情（ID=1）
+GET {{baseUrl}}/1
+
+### 5. 更新配置
+PUT {{baseUrl}}/1
+Content-Type: application/json
+
+{
+  "configKey": "app.settings",
+  "configName": "应用设置-已更新",
+  "configValue": "{\"theme\": \"dark\", \"language\": \"en-US\"}",
+  "description": "系统基础配置-已更新",
+  "operator": "admin"
+}
+
+### 6. 再次更新配置（生成多个历史版本）
+PUT {{baseUrl}}/1
+Content-Type: application/json
+
+{
+  "configKey": "app.settings",
+  "configName": "应用设置-V3",
+  "configValue": "{\"theme\": \"light\", \"language\": \"zh-CN\", \"fontSize\": 14}",
+  "description": "系统基础配置-V3",
+  "operator": "user1"
+}
+
+### 7. 获取配置的历史记录
+GET {{baseUrl}}/1/history?page=1&pageSize=10
+
+### 8. 获取指定历史版本详情
+GET {{baseUrl}}/1/history/1
+
+### 9. 版本对比（对比版本1和版本2）
+GET {{baseUrl}}/1/diff?from=1&to=2
+
+### 10. 回退到指定版本
+POST {{baseUrl}}/1/rollback/1?operator=admin
+
+### 11. 新增另一个配置用于测试
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "configKey": "database.pool",
+  "configName": "数据库连接池配置",
+  "configValue": "{\"maxPoolSize\": 20, \"minIdle\": 5, \"connectionTimeout\": 30000}",
+  "description": "数据库连接池参数配置",
+  "operator": "system"
+}
+
+### 12. 获取所有配置列表
+GET {{baseUrl}}?page=1&pageSize=20
+
+### 13. 删除配置
+DELETE {{baseUrl}}/2
+
+### 14. 验证删除后的列表
+GET {{baseUrl}}?page=1&pageSize=10

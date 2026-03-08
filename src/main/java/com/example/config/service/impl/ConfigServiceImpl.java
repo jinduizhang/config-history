@@ -197,8 +197,8 @@ public class ConfigServiceImpl implements ConfigService {
     private Map<String, DiffResponse.DiffItem> computeDiff(String json1, String json2) {
         Map<String, DiffResponse.DiffItem> result = new HashMap<>();
         try {
-            Map<String, Object> map1 = objectMapper.readValue(json1, new TypeReference<>() {});
-            Map<String, Object> map2 = objectMapper.readValue(json2, new TypeReference<>() {});
+            Map<String, Object> map1 = parseJsonOrString(json1);
+            Map<String, Object> map2 = parseJsonOrString(json2);
 
             for (String key : map1.keySet()) {
                 if (!map2.containsKey(key)) {
@@ -225,10 +225,24 @@ public class ConfigServiceImpl implements ConfigService {
                             .build());
                 }
             }
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("JSON解析失败", e);
+        } catch (Exception e) {
+            result.put("value", DiffResponse.DiffItem.builder()
+                    .type("MODIFY")
+                    .oldValue(json1)
+                    .newValue(json2)
+                    .build());
         }
         return result;
+    }
+
+    private Map<String, Object> parseJsonOrString(String value) {
+        try {
+            return objectMapper.readValue(value, new TypeReference<>() {});
+        } catch (JsonProcessingException e) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("value", value);
+            return map;
+        }
     }
 
     private ConfigResponse toResponse(ConfigItem item) {

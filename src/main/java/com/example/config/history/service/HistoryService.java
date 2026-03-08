@@ -8,7 +8,6 @@ import com.example.config.history.dto.DiffResult;
 import com.example.config.history.dto.HistoryRecord;
 import com.example.config.history.entity.GenericHistory;
 import com.example.config.history.mapper.GenericHistoryMapper;
-import com.example.config.history.service.DiffCalculator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,6 +15,12 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.Collections;
 
+/**
+ * 通用历史记录服务
+ * <p>
+ * 提供历史记录的查询、对比和回退功能
+ * </p>
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -24,6 +29,15 @@ public class HistoryService {
     private final GenericHistoryMapper genericHistoryMapper;
     private final DiffCalculator diffCalculator;
 
+    /**
+     * 获取实体历史记录列表
+     *
+     * @param entityType 实体类型
+     * @param entityId   实体ID
+     * @param page       页码
+     * @param pageSize   每页数量
+     * @return 分页历史记录
+     */
     public PageResult<HistoryRecord> getHistory(String entityType, Long entityId, Integer page, Integer pageSize) {
         Page<GenericHistory> pageParam = new Page<>(page, pageSize);
         LambdaQueryWrapper<GenericHistory> wrapper = new LambdaQueryWrapper<>();
@@ -41,6 +55,15 @@ public class HistoryService {
         );
     }
 
+    /**
+     * 获取指定历史版本详情
+     *
+     * @param entityType 实体类型
+     * @param entityId   实体ID
+     * @param versionId  历史版本ID
+     * @return 历史版本详情
+     * @throws RuntimeException 版本不存在或与实体不匹配时抛出
+     */
     public HistoryRecord getVersion(String entityType, Long entityId, Long versionId) {
         GenericHistory history = genericHistoryMapper.selectById(versionId);
         if (history == null || !history.getEntityType().equals(entityType) || !history.getEntityId().equals(entityId)) {
@@ -49,6 +72,16 @@ public class HistoryService {
         return toRecord(history);
     }
 
+    /**
+     * 对比两个历史版本
+     *
+     * @param entityType 实体类型
+     * @param entityId   实体ID
+     * @param versionId1 版本1 ID
+     * @param versionId2 版本2 ID
+     * @return 差异对比结果
+     * @throws RuntimeException 版本不存在或不匹配时抛出
+     */
     public DiffResult compareVersions(String entityType, Long entityId, Long versionId1, Long versionId2) {
         GenericHistory v1 = genericHistoryMapper.selectById(versionId1);
         GenericHistory v2 = genericHistoryMapper.selectById(versionId2);
@@ -71,6 +104,16 @@ public class HistoryService {
                 .build();
     }
 
+    /**
+     * 回退到指定版本
+     *
+     * @param entityType 实体类型
+     * @param entityId   实体ID
+     * @param versionId  目标版本ID
+     * @param operator   操作人
+     * @param reason     回退原因
+     * @throws RuntimeException 目标版本不存在时抛出
+     */
     public void rollback(String entityType, Long entityId, Long versionId, String operator, String reason) {
         GenericHistory targetVersion = genericHistoryMapper.selectById(versionId);
         if (targetVersion == null || !targetVersion.getEntityType().equals(entityType) 
@@ -81,6 +124,12 @@ public class HistoryService {
         log.info("Rollback {}:{} to version {}, operator: {}", entityType, entityId, targetVersion.getVersionNo(), operator);
     }
 
+    /**
+     * 将实体转换为DTO
+     *
+     * @param history 历史记录实体
+     * @return 历史记录DTO
+     */
     private HistoryRecord toRecord(GenericHistory history) {
         HistoryRecord record = new HistoryRecord();
         record.setId(history.getId());

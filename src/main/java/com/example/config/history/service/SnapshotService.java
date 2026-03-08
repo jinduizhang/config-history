@@ -13,6 +13,12 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 快照服务
+ * <p>
+ * 负责生成和恢复实体快照
+ * </p>
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -20,6 +26,17 @@ public class SnapshotService {
 
     private final ObjectMapper objectMapper;
 
+    /**
+     * 生成实体快照
+     * <p>
+     * 根据实体上的@HistoryTrack和@HistoryField注解生成JSON快照
+     * </p>
+     *
+     * @param entity 实体对象
+     * @param <T>    实体类型
+     * @return JSON格式的快照
+     * @throws RuntimeException 快照生成失败时抛出
+     */
     public <T> String snapshot(T entity) {
         try {
             Map<String, Object> data = new HashMap<>();
@@ -50,6 +67,15 @@ public class SnapshotService {
         }
     }
 
+    /**
+     * 从快照恢复实体
+     *
+     * @param snapshot    JSON快照
+     * @param entityClass 实体类
+     * @param <T>         实体类型
+     * @return 恢复的实体对象
+     * @throws RuntimeException 恢复失败时抛出
+     */
     public <T> T restore(String snapshot, Class<T> entityClass) {
         try {
             return objectMapper.readValue(snapshot, entityClass);
@@ -59,6 +85,15 @@ public class SnapshotService {
         }
     }
 
+    /**
+     * 将快照解析为Map
+     * <p>
+     * 如果快照不是有效的JSON，则将其作为value字段包装
+     * </p>
+     *
+     * @param snapshot JSON快照
+     * @return 解析后的Map
+     */
     public Map<String, Object> parseToMap(String snapshot) {
         try {
             return objectMapper.readValue(snapshot, new TypeReference<>() {});

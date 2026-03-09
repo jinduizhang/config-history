@@ -10,13 +10,13 @@ const routes: RouteRecordRaw[] = [
     path: '/config',
     name: 'Config',
     component: () => import('@/views/ConfigList.vue'),
-    meta: { title: '配置管理' }
+    meta: { title: 'Config Management' }
   },
   {
     path: '/config/:id/history',
     name: 'ConfigHistory',
     component: () => import('@/views/HistoryList.vue'),
-    meta: { title: '历史记录' }
+    meta: { title: 'History' }
   }
 ]
 
@@ -26,7 +26,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, _from, next) => {
-  document.title = (to.meta.title as string) || '配置历史管理'
+  document.title = (to.meta.title as string) || 'Config History Management'
   next()
 })
 

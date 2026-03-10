@@ -91,17 +91,7 @@ public class ConfigServiceImpl implements ConfigService {
             throw new RuntimeException("配置不存在");
         }
 
-        Integer maxVersion = configHistoryMapper.selectMaxVersionNo(id);
-        ConfigHistory history = new ConfigHistory();
-        history.setConfigId(id);
-        history.setVersionNo(maxVersion + 1);
-        history.setConfigValue(item.getConfigValue());
-        history.setChangeType("UPDATE");
-        history.setOperator(request.getOperator());
-        history.setOperatorIp(request.getOperatorIp());
-        history.setChangeReason(request.getChangeReason());
-        configHistoryMapper.insert(history);
-
+        // 先更新配置
         item.setConfigValue(request.getConfigValue());
         if (request.getConfigName() != null) {
             item.setConfigName(request.getConfigName());
@@ -110,6 +100,18 @@ public class ConfigServiceImpl implements ConfigService {
             item.setDescription(request.getDescription());
         }
         configItemMapper.updateById(item);
+
+        // 再记录历史（保存新值）
+        Integer maxVersion = configHistoryMapper.selectMaxVersionNo(id);
+        ConfigHistory history = new ConfigHistory();
+        history.setConfigId(id);
+        history.setVersionNo(maxVersion + 1);
+        history.setConfigValue(request.getConfigValue()); // 保存新值
+        history.setChangeType("UPDATE");
+        history.setOperator(request.getOperator());
+        history.setOperatorIp(request.getOperatorIp());
+        history.setChangeReason(request.getChangeReason());
+        configHistoryMapper.insert(history);
 
         return toResponse(item);
     }

@@ -5,14 +5,17 @@ import { RouterView } from 'vue-router'
 <template>
   <a-layout class="app-layout">
     <a-layout-header class="app-header">
-      <div class="logo">配置历史管理系统</div>
+      <div class="logo">Config History</div>
       <a-menu
         theme="dark"
         mode="horizontal"
         :style="{ lineHeight: '64px' }"
       >
         <a-menu-item key="config" @click="$router.push('/config')">
-          配置管理
+          Config
+        </a-menu-item>
+        <a-menu-item key="shell-demo" @click="$router.push('/shell-demo')">
+          Shell Demo
         </a-menu-item>
       </a-menu>
     </a-layout-header>

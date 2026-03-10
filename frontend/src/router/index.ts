@@ -17,6 +17,12 @@ const routes: RouteRecordRaw[] = [
     name: 'ConfigHistory',
     component: () => import('@/views/HistoryList.vue'),
     meta: { title: 'History' }
+  },
+  {
+    path: '/shell-demo',
+    name: 'ShellDemo',
+    component: () => import('@/views/ShellConfigDemo.vue'),
+    meta: { title: 'Shell Script Demo' }
   }
 ]
 

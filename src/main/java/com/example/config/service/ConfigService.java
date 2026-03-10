@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.config.common.PageResult;
 import com.example.config.dto.ConfigRequest;
+import com.example.config.dto.ConfigResponse;
 import com.example.config.dto.DiffResponse;
 import com.example.config.dto.HistoryResponse;
 
@@ -23,7 +24,7 @@ public interface ConfigService {
      * @param keyword  搜索关键字，可为null
      * @return 分页配置列表
      */
-    PageResult<com.example.config.dto.ConfigResponse> listConfigs(Integer page, Integer pageSize, String keyword);
+    PageResult<ConfigResponse> listConfigs(Integer page, Integer pageSize, String keyword);
 
     /**
      * 根据ID获取配置详情
@@ -32,7 +33,7 @@ public interface ConfigService {
      * @return 配置详情
      * @throws RuntimeException 配置不存在时抛出异常
      */
-    com.example.config.dto.ConfigResponse getConfigById(Long id);
+    ConfigResponse getConfigById(Long id);
 
     /**
      * 创建配置
@@ -40,7 +41,7 @@ public interface ConfigService {
      * @param request 配置请求信息
      * @return 创建后的配置
      */
-    com.example.config.dto.ConfigResponse createConfig(ConfigRequest request);
+    ConfigResponse createConfig(ConfigRequest request);
 
     /**
      * 更新配置
@@ -50,7 +51,7 @@ public interface ConfigService {
      * @return 更新后的配置
      * @throws RuntimeException 配置不存在时抛出异常
      */
-    com.example.config.dto.ConfigResponse updateConfig(Long id, ConfigRequest request);
+    ConfigResponse updateConfig(Long id, ConfigRequest request);
 
     /**
      * 删除配置（软删除）

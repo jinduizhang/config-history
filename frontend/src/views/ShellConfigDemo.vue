@@ -2,61 +2,69 @@
 import { ref } from 'vue'
 import ShellHistoryPanel from '@/components/ShellHistoryPanel.vue'
 
-// 模拟配置ID（实际使用时从路由或父组件传入）
-const configId = ref(1)
+const configId = ref(2)
 
-// 处理脚本变更
 function handleChange(value: string) {
   console.log('Script changed:', value)
 }
 
-// 处理回退
 function handleRollback(version: any) {
   console.log('Rollback to version:', version)
 }
 </script>
 
 <template>
-  <div class="shell-config-page">
-    <!-- 页面头部 -->
+  <div class="demo-page">
     <div class="page-header">
-      <h2>Shell Script Configuration</h2>
-      <p>Integrate the history panel into your shell script configuration page</p>
+      <h1>Shell Script Configuration</h1>
+      <p>Manage your shell scripts with version history</p>
     </div>
 
-    <!-- 集成示例 -->
-    <div class="integration-demo">
-      <a-row :gutter="16">
-        <!-- 左侧：配置表单示例 -->
-        <a-col :span="8">
-          <a-card title="Config Form" size="small">
-            <a-form layout="vertical">
-              <a-form-item label="Config ID">
-                <a-input-number v-model:value="configId" :min="1" style="width: 100%" />
-              </a-form-item>
-              <a-form-item label="Script Name">
-                <a-input placeholder="deploy.sh" />
-              </a-form-item>
-              <a-form-item label="Description">
-                <a-textarea placeholder="Script description..." :rows="2" />
-              </a-form-item>
-              <a-form-item>
-                <a-space>
-                  <a-button type="primary">Save</a-button>
-                  <a-button>Cancel</a-button>
-                </a-space>
-              </a-form-item>
-            </a-form>
-          </a-card>
+    <div class="page-content">
+      <a-row :gutter="24">
+        <a-col :span="6">
+          <div class="side-panel">
+            <div class="panel-section">
+              <h3>Configuration</h3>
+              <a-form layout="vertical">
+                <a-form-item label="Script ID">
+                  <a-input-number 
+                    v-model:value="configId" 
+                    :min="1" 
+                    style="width: 100%"
+                  />
+                </a-form-item>
+                <a-form-item label="Script Name">
+                  <a-input value="deploy.sh" readonly />
+                </a-form-item>
+              </a-form>
+            </div>
+
+            <div class="panel-section">
+              <h3>Quick Actions</h3>
+              <a-space direction="vertical" style="width: 100%">
+                <a-button type="primary" block>Save Changes</a-button>
+                <a-button block>Run Script</a-button>
+              </a-space>
+            </div>
+
+            <div class="panel-section tips">
+              <h3>Tips</h3>
+              <ul>
+                <li>Click history item to view</li>
+                <li>Select 2 versions to compare</li>
+                <li>Click rollback icon to restore</li>
+              </ul>
+            </div>
+          </div>
         </a-col>
 
-        <!-- 右侧：Shell历史组件 -->
-        <a-col :span="16">
-          <div class="history-wrapper">
+        <a-col :span="18">
+          <div class="main-panel">
             <ShellHistoryPanel
               :entity-id="configId"
               entity-type="ShellScript"
-              title="Shell Script History"
+              title="Deploy Script"
               :readonly="true"
               @change="handleChange"
               @rollback="handleRollback"
@@ -65,69 +73,79 @@ function handleRollback(version: any) {
         </a-col>
       </a-row>
     </div>
-
-    <!-- 使用说明 -->
-    <a-card title="Integration Guide" size="small" style="margin-top: 16px">
-      <a-alert type="info" show-icon style="margin-bottom: 16px">
-        <template #message>
-          <strong>Quick Integration</strong>
-        </template>
-        <template #description>
-          <pre style="margin: 8px 0; font-size: 12px">
-&lt;ShellHistoryPanel
-  :entity-id="yourConfigId"
-  entity-type="ShellScript"
-  title="Script History"
-  @change="handleScriptChange"
-  @rollback="handleRollback"
-/&gt;</pre>
-        </template>
-      </a-alert>
-
-      <a-descriptions :column="1" size="small" bordered>
-        <a-descriptions-item label="entityId">
-          The ID of your shell script config (required)
-        </a-descriptions-item>
-        <a-descriptions-item label="entityType">
-          Entity type, default: 'ShellScript'
-        </a-descriptions-item>
-        <a-descriptions-item label="title">
-          Panel title, default: 'Script History'
-        </a-descriptions-item>
-        <a-descriptions-item label="readonly">
-          Editor read-only mode, default: true
-        </a-descriptions-item>
-        <a-descriptions-item label="@change">
-          Emitted when script content changes
-        </a-descriptions-item>
-        <a-descriptions-item label="@rollback">
-          Emitted when rollback is performed
-        </a-descriptions-item>
-      </a-descriptions>
-    </a-card>
   </div>
 </template>
 
 <style scoped>
-.shell-config-page {
-  padding: 16px;
+.demo-page {
+  min-height: 100vh;
+  background: #f5f5f5;
 }
 
 .page-header {
-  margin-bottom: 16px;
+  padding: 20px 32px;
+  background: #ffffff;
+  border-bottom: 1px solid #e8e8e8;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
-.page-header h2 {
-  margin: 0 0 4px 0;
+.page-header h1 {
+  margin: 0 0 6px 0;
+  color: #262626;
+  font-size: 22px;
+  font-weight: 600;
 }
 
 .page-header p {
   margin: 0;
-  color: #666;
+  color: #8c8c8c;
   font-size: 14px;
 }
 
-.history-wrapper {
-  height: 400px;
+.page-content {
+  padding: 24px;
+}
+
+.side-panel {
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.panel-section {
+  padding: 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.panel-section:last-child {
+  border-bottom: none;
+}
+
+.panel-section h3 {
+  margin: 0 0 16px 0;
+  color: #262626;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.panel-section :deep(.ant-form-item-label label) {
+  color: #595959;
+}
+
+.tips ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #8c8c8c;
+  font-size: 13px;
+  line-height: 2;
+}
+
+.main-panel {
+  height: calc(100vh - 140px);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 </style>

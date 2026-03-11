@@ -163,75 +163,77 @@ public class ConfigServiceImpl implements ConfigService {
 
         Integer maxVersion = configHistoryMapper.selectMaxVersionNo(configId);
 
+        // 先更新配置为目标版本的值
+        current.setConfigValue(targetVersion.getConfigValue());
+        configItemMapper.updateById(current);
+
+        // 再记录历史（保存回退后的值，即目标版本的值）
         ConfigHistory rollbackHistory = new ConfigHistory();
         rollbackHistory.setConfigId(configId);
         rollbackHistory.setVersionNo(maxVersion + 1);
-        rollbackHistory.setConfigValue(current.getConfigValue());
+        rollbackHistory.setConfigValue(targetVersion.getConfigValue()); // 保存目标版本的值
         rollbackHistory.setChangeType("ROLLBACK");
         rollbackHistory.setOperator(operator);
         rollbackHistory.setChangeReason("回退到版本 " + targetVersion.getVersionNo());
         configHistoryMapper.insert(rollbackHistory);
-
-        current.setConfigValue(targetVersion.getConfigValue());
-        configItemMapper.updateById(current);
     }
 
     @Override
     public DiffResponse compareVersions(Long configId, Long versionId1, Long versionId2) {
-        ConfigHistory v1 = configHistoryMapper.selectById(versionId1);
-        ConfigHistory v2 = configHistoryMapper.selectById(versionId2);
+        ConfigHistory sourceHistory = configHistoryMapper.selectById(versionId1);
+        ConfigHistory targetHistory = configHistoryMapper.selectById(versionId2);
 
-        if (v1 == null || v2 == null) {
+        if (sourceHistory == null || targetHistory == null) {
             throw new RuntimeException("历史版本不存在");
         }
 
-        Map<String, DiffResponse.DiffItem> diffMap = computeDiff(v1.getConfigValue(), v2.getConfigValue());
+        Map<String, DiffResponse.DiffItem> diffMap = computeDiff(sourceHistory.getConfigValue(), targetHistory.getConfigValue());
 
         return DiffResponse.builder()
-                .version1(v1.getVersionNo())
-                .version2(v2.getVersionNo())
-                .value1(v1.getConfigValue())
-                .value2(v2.getConfigValue())
+                .sourceVersion(sourceHistory.getVersionNo())
+                .targetVersion(targetHistory.getVersionNo())
+                .sourceValue(sourceHistory.getConfigValue())
+                .targetValue(targetHistory.getConfigValue())
                 .differences(diffMap)
                 .build();
     }
 
-    private Map<String, DiffResponse.DiffItem> computeDiff(String json1, String json2) {
+    private Map<String, DiffResponse.DiffItem> computeDiff(String sourceJson, String targetJson) {
         Map<String, DiffResponse.DiffItem> result = new HashMap<>();
         try {
-            Map<String, Object> map1 = parseJsonOrString(json1);
-            Map<String, Object> map2 = parseJsonOrString(json2);
+            Map<String, Object> sourceMap = parseJsonOrString(sourceJson);
+            Map<String, Object> targetMap = parseJsonOrString(targetJson);
 
-            for (String key : map1.keySet()) {
-                if (!map2.containsKey(key)) {
+            for (String key : sourceMap.keySet()) {
+                if (!targetMap.containsKey(key)) {
                     result.put(key, DiffResponse.DiffItem.builder()
                             .type("DELETE")
-                            .oldValue(map1.get(key))
+                            .oldValue(sourceMap.get(key))
                             .newValue(null)
                             .build());
-                } else if (!map1.get(key).equals(map2.get(key))) {
+                } else if (!sourceMap.get(key).equals(targetMap.get(key))) {
                     result.put(key, DiffResponse.DiffItem.builder()
                             .type("MODIFY")
-                            .oldValue(map1.get(key))
-                            .newValue(map2.get(key))
+                            .oldValue(sourceMap.get(key))
+                            .newValue(targetMap.get(key))
                             .build());
                 }
             }
 
-            for (String key : map2.keySet()) {
-                if (!map1.containsKey(key)) {
+            for (String key : targetMap.keySet()) {
+                if (!sourceMap.containsKey(key)) {
                     result.put(key, DiffResponse.DiffItem.builder()
                             .type("ADD")
                             .oldValue(null)
-                            .newValue(map2.get(key))
+                            .newValue(targetMap.get(key))
                             .build());
                 }
             }
         } catch (Exception e) {
             result.put("value", DiffResponse.DiffItem.builder()
                     .type("MODIFY")
-                    .oldValue(json1)
-                    .newValue(json2)
+                    .oldValue(sourceJson)
+                    .newValue(targetJson)
                     .build());
         }
         return result;

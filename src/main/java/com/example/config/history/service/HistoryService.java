@@ -107,24 +107,24 @@ public class HistoryService {
     }
 
     public DiffResult compareVersions(String entityType, Long entityId, Long versionId1, Long versionId2) {
-        GenericHistory v1 = genericHistoryMapper.selectById(versionId1);
-        GenericHistory v2 = genericHistoryMapper.selectById(versionId2);
+        GenericHistory sourceHistory = genericHistoryMapper.selectById(versionId1);
+        GenericHistory targetHistory = genericHistoryMapper.selectById(versionId2);
         
-        if (v1 == null || v2 == null) {
+        if (sourceHistory == null || targetHistory == null) {
             throw new HistoryException("历史版本不存在");
         }
         
-        if (!v1.getEntityType().equals(entityType) || !v1.getEntityId().equals(entityId) ||
-            !v2.getEntityType().equals(entityType) || !v2.getEntityId().equals(entityId)) {
+        if (!sourceHistory.getEntityType().equals(entityType) || !sourceHistory.getEntityId().equals(entityId) ||
+            !targetHistory.getEntityType().equals(entityType) || !targetHistory.getEntityId().equals(entityId)) {
             throw new HistoryException("版本与实体不匹配");
         }
         
         return DiffResult.builder()
-                .version1(v1.getVersionNo())
-                .version2(v2.getVersionNo())
-                .snapshot1(v1.getSnapshot())
-                .snapshot2(v2.getSnapshot())
-                .differences(diffCalculator.calculate(v1.getSnapshot(), v2.getSnapshot()))
+                .sourceVersion(sourceHistory.getVersionNo())
+                .targetVersion(targetHistory.getVersionNo())
+                .sourceSnapshot(sourceHistory.getSnapshot())
+                .targetSnapshot(targetHistory.getSnapshot())
+                .differences(diffCalculator.calculate(sourceHistory.getSnapshot(), targetHistory.getSnapshot()))
                 .build();
     }
 

@@ -20,24 +20,24 @@ import java.util.Map;
 public class DiffResponse {
     
     /**
-     * 版本号1
+     * 源版本号
      */
-    private Integer version1;
+    private Integer sourceVersion;
     
     /**
-     * 版本号2
+     * 目标版本号
      */
-    private Integer version2;
+    private Integer targetVersion;
     
     /**
-     * 版本1的配置值
+     * 源版本配置值
      */
-    private String value1;
+    private String sourceValue;
     
     /**
-     * 版本2的配置值
+     * 目标版本配置值
      */
-    private String value2;
+    private String targetValue;
     
     /**
      * 差异详情，key为字段名，value为差异项

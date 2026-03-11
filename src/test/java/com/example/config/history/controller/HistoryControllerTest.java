@@ -171,10 +171,10 @@ class HistoryControllerTest {
                 .type("MODIFY").oldValue("light").newValue("dark").build());
 
         DiffResult diffResult = DiffResult.builder()
-                .version1(1)
-                .version2(2)
-                .snapshot1("{\"theme\":\"light\"}")
-                .snapshot2("{\"theme\":\"dark\"}")
+                .sourceVersion(1)
+                .targetVersion(2)
+                .sourceSnapshot("{\"theme\":\"light\"}")
+                .targetSnapshot("{\"theme\":\"dark\"}")
                 .differences(diffItems)
                 .build();
 
@@ -186,8 +186,8 @@ class HistoryControllerTest {
                         .param("to", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.version1").value(1))
-                .andExpect(jsonPath("$.data.version2").value(2))
+                .andExpect(jsonPath("$.data.sourceVersion").value(1))
+                .andExpect(jsonPath("$.data.targetVersion").value(2))
                 .andExpect(jsonPath("$.data.differences.theme.type").value("MODIFY"));
     }
 
@@ -196,10 +196,10 @@ class HistoryControllerTest {
     void compareVersions_noDifferences() throws Exception {
         // Given
         DiffResult diffResult = DiffResult.builder()
-                .version1(1)
-                .version2(2)
-                .snapshot1("{\"theme\":\"light\"}")
-                .snapshot2("{\"theme\":\"light\"}")
+                .sourceVersion(1)
+                .targetVersion(2)
+                .sourceSnapshot("{\"theme\":\"light\"}")
+                .targetSnapshot("{\"theme\":\"light\"}")
                 .differences(new HashMap<>())
                 .build();
 

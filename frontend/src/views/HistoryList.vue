@@ -158,7 +158,7 @@ onMounted(() => {
       <a-spin :spinning="diffLoading">
         <div v-if="diffResult" class="diff-content">
           <a-descriptions :column="2" bordered>
-            <a-descriptions-item label="Version">{{ diffResult.version1 }} vs {{ diffResult.version2 }}</a-descriptions-item>
+            <a-descriptions-item label="Version">{{ diffResult.sourceVersion }} vs {{ diffResult.targetVersion }}</a-descriptions-item>
           </a-descriptions>
           
           <h4 style="margin-top: 16px">Differences</h4>

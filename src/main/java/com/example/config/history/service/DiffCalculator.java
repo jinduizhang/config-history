@@ -16,11 +16,11 @@ public interface DiffCalculator {
     /**
      * 计算两个快照的差异
      *
-     * @param snapshot1 快照1（旧版本）
-     * @param snapshot2 快照2（新版本）
+     * @param sourceSnapshot 源快照（旧版本）
+     * @param targetSnapshot 目标快照（新版本）
      * @return 差异项Map，key为字段名，value为差异详情
      */
-    Map<String, DiffItem> calculate(String snapshot1, String snapshot2);
+    Map<String, DiffItem> calculate(String sourceSnapshot, String targetSnapshot);
 
     /**
      * 差异项

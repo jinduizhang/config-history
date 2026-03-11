@@ -43,10 +43,10 @@ export interface HistoryRecord {
 }
 
 export interface DiffResult {
-  version1: number
-  version2: number
-  snapshot1: string
-  snapshot2: string
+  sourceVersion: number
+  targetVersion: number
+  sourceValue: string
+  targetValue: string
   differences: Record<string, DiffItem>
 }
 

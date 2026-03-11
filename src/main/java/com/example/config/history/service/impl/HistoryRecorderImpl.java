@@ -103,13 +103,13 @@ public class HistoryRecorderImpl implements HistoryRecorder {
         return changedFields;
     }
 
-    private boolean equals(Object obj1, Object obj2) {
-        if (obj1 == null && obj2 == null) {
+    private boolean equals(Object first, Object second) {
+        if (first == null && second == null) {
             return true;
         }
-        if (obj1 == null || obj2 == null) {
+        if (first == null || second == null) {
             return false;
         }
-        return obj1.equals(obj2);
+        return first.equals(second);
     }
 }

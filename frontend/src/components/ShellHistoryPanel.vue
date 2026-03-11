@@ -121,11 +121,11 @@ async function compareVersions() {
 const lineDiff = computed(() => {
   if (!diffResult.value) return []
   
-  const v1 = diffResult.value.value1 || ''
-  const v2 = diffResult.value.value2 || ''
+  const sourceContent = diffResult.value.sourceValue || ''
+  const targetContent = diffResult.value.targetValue || ''
   
-  const lines1 = v1.split('\n')
-  const lines2 = v2.split('\n')
+  const sourceLines = sourceContent.split('\n')
+  const targetLines = targetContent.split('\n')
   
   const result: Array<{
     type: 'same' | 'add' | 'delete' | 'modify'
@@ -136,20 +136,20 @@ const lineDiff = computed(() => {
   }> = []
   
   // Simple line-by-line comparison
-  const maxLines = Math.max(lines1.length, lines2.length)
+  const maxLines = Math.max(sourceLines.length, targetLines.length)
   
   for (let i = 0; i < maxLines; i++) {
-    const line1 = lines1[i]
-    const line2 = lines2[i]
+    const sourceLine = sourceLines[i]
+    const targetLine = targetLines[i]
     
-    if (line1 === undefined) {
-      result.push({ type: 'add', line2: i + 1, content: line2 })
-    } else if (line2 === undefined) {
-      result.push({ type: 'delete', line1: i + 1, content: line1 })
-    } else if (line1 === line2) {
-      result.push({ type: 'same', line1: i + 1, line2: i + 1, content: line1 })
+    if (sourceLine === undefined) {
+      result.push({ type: 'add', line2: i + 1, content: targetLine })
+    } else if (targetLine === undefined) {
+      result.push({ type: 'delete', line1: i + 1, content: sourceLine })
+    } else if (sourceLine === targetLine) {
+      result.push({ type: 'same', line1: i + 1, line2: i + 1, content: sourceLine })
     } else {
-      result.push({ type: 'modify', line1: i + 1, line2: i + 1, content: line2, oldContent: line1 })
+      result.push({ type: 'modify', line1: i + 1, line2: i + 1, content: targetLine, oldContent: sourceLine })
     }
   }
   
@@ -343,9 +343,9 @@ onMounted(() => {
     >
       <div v-if="diffResult" class="diff-result">
         <div class="diff-header">
-          <a-tag color="#52c41a">v{{ diffResult.version1 }}</a-tag>
+          <a-tag color="#52c41a">v{{ diffResult.sourceVersion }}</a-tag>
           <span class="diff-arrow">→</span>
-          <a-tag color="#1890ff">v{{ diffResult.version2 }}</a-tag>
+          <a-tag color="#1890ff">v{{ diffResult.targetVersion }}</a-tag>
           <span class="diff-stats">
             {{ lineDiff.filter(l => l.type === 'add').length }} added,
             {{ lineDiff.filter(l => l.type === 'delete').length }} deleted,
@@ -358,7 +358,7 @@ onMounted(() => {
           <div class="diff-side-by-side">
             <!-- Old Version -->
             <div class="diff-pane">
-              <div class="diff-pane-header">v{{ diffResult.version1 }}</div>
+              <div class="diff-pane-header">v{{ diffResult.sourceVersion }}</div>
               <div class="diff-pane-content">
                 <div 
                   v-for="(line, idx) in lineDiff" 
@@ -374,7 +374,7 @@ onMounted(() => {
             
             <!-- New Version -->
             <div class="diff-pane">
-              <div class="diff-pane-header">v{{ diffResult.version2 }}</div>
+              <div class="diff-pane-header">v{{ diffResult.targetVersion }}</div>
               <div class="diff-pane-content">
                 <div 
                   v-for="(line, idx) in lineDiff" 

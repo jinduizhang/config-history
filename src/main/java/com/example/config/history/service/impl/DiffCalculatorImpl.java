@@ -23,37 +23,37 @@ public class DiffCalculatorImpl implements DiffCalculator {
     private final SnapshotService snapshotService;
 
     @Override
-    public Map<String, DiffItem> calculate(String snapshot1, String snapshot2) {
+    public Map<String, DiffItem> calculate(String sourceSnapshot, String targetSnapshot) {
         Map<String, DiffItem> result = new HashMap<>();
         
         try {
-            Map<String, Object> map1 = snapshotService.parseToMap(snapshot1);
-            Map<String, Object> map2 = snapshotService.parseToMap(snapshot2);
+            Map<String, Object> sourceMap = snapshotService.parseToMap(sourceSnapshot);
+            Map<String, Object> targetMap = snapshotService.parseToMap(targetSnapshot);
 
-            for (String key : map1.keySet()) {
-                if (!map2.containsKey(key)) {
+            for (String key : sourceMap.keySet()) {
+                if (!targetMap.containsKey(key)) {
                     result.put(key, DiffItem.builder()
                             .type("DELETE")
-                            .oldValue(map1.get(key))
+                            .oldValue(sourceMap.get(key))
                             .newValue(null)
                             .displayName(key)
                             .build());
-                } else if (!equals(map1.get(key), map2.get(key))) {
+                } else if (!equals(sourceMap.get(key), targetMap.get(key))) {
                     result.put(key, DiffItem.builder()
                             .type("MODIFY")
-                            .oldValue(map1.get(key))
-                            .newValue(map2.get(key))
+                            .oldValue(sourceMap.get(key))
+                            .newValue(targetMap.get(key))
                             .displayName(key)
                             .build());
                 }
             }
 
-            for (String key : map2.keySet()) {
-                if (!map1.containsKey(key)) {
+            for (String key : targetMap.keySet()) {
+                if (!sourceMap.containsKey(key)) {
                     result.put(key, DiffItem.builder()
                             .type("ADD")
                             .oldValue(null)
-                            .newValue(map2.get(key))
+                            .newValue(targetMap.get(key))
                             .displayName(key)
                             .build());
                 }
@@ -62,8 +62,8 @@ public class DiffCalculatorImpl implements DiffCalculator {
             log.warn("Failed to calculate diff, using simple comparison", e);
             result.put("value", DiffItem.builder()
                     .type("MODIFY")
-                    .oldValue(snapshot1)
-                    .newValue(snapshot2)
+                    .oldValue(sourceSnapshot)
+                    .newValue(targetSnapshot)
                     .displayName("value")
                     .build());
         }
@@ -71,13 +71,13 @@ public class DiffCalculatorImpl implements DiffCalculator {
         return result;
     }
 
-    private boolean equals(Object obj1, Object obj2) {
-        if (obj1 == null && obj2 == null) {
+    private boolean equals(Object first, Object second) {
+        if (first == null && second == null) {
             return true;
         }
-        if (obj1 == null || obj2 == null) {
+        if (first == null || second == null) {
             return false;
         }
-        return obj1.equals(obj2);
+        return first.equals(second);
     }
 }

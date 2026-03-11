@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
+import { HistoryOutlined } from '@ant-design/icons-vue'
 import { configApi } from '@/api/config'
 import type { ConfigItem, ConfigRequest } from '@/types'
-
-const router = useRouter()
+import ShellHistoryModal from '@/components/ShellHistoryModal.vue'
 
 const loading = ref(false)
 const configs = ref<ConfigItem[]>([])
 const total = ref(0)
 const currentPage = ref(1)
 const pageSize = ref(10)
+const historyModal = ref<InstanceType<typeof ShellHistoryModal>>()
 
 const modalVisible = ref(false)
 const modalLoading = ref(false)
@@ -91,7 +91,7 @@ function handlePageChange(page: number, size: number) {
 }
 
 function viewHistory(id: number) {
-  router.push(`/config/${id}/history`)
+  historyModal.value?.open(id)
 }
 
 onMounted(() => {
@@ -124,6 +124,7 @@ onMounted(() => {
           <template v-if="column.key === 'action'">
             <a-space>
               <a-button type="link" size="small" @click="viewHistory(record.id)">
+                <HistoryOutlined />
                 历史
               </a-button>
               <a-button type="link" size="small" @click="handleEdit(record)">
@@ -159,6 +160,13 @@ onMounted(() => {
         </a-form-item>
       </a-form>
     </a-modal>
+
+    <!-- 历史记录弹出框 -->
+    <ShellHistoryModal 
+      ref="historyModal"
+      title="配置历史记录"
+      @refresh="fetchConfigs"
+    />
   </div>
 </template>
 

@@ -14,9 +14,6 @@ import { RouterView } from 'vue-router'
         <a-menu-item key="config" @click="$router.push('/config')">
           Config
         </a-menu-item>
-        <a-menu-item key="shell-demo" @click="$router.push('/shell-demo')">
-          Shell Demo
-        </a-menu-item>
       </a-menu>
     </a-layout-header>
     <a-layout-content class="app-content">

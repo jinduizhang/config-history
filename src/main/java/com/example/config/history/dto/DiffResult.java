@@ -14,24 +14,24 @@ import java.util.Map;
 public class DiffResult {
     
     /**
-     * 版本1版本号
+     * 源版本号
      */
-    private Integer version1;
+    private Integer sourceVersion;
     
     /**
-     * 版本2版本号
+     * 目标版本号
      */
-    private Integer version2;
+    private Integer targetVersion;
     
     /**
-     * 版本1快照数据
+     * 源版本快照数据
      */
-    private String snapshot1;
+    private String sourceSnapshot;
     
     /**
-     * 版本2快照数据
+     * 目标版本快照数据
      */
-    private String snapshot2;
+    private String targetSnapshot;
     
     /**
      * 差异详情

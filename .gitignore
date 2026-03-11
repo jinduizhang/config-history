@@ -1,6 +1,11 @@
 .opencode/
+.sisyphus/
 target/
 .idea/
 *.iml
 .DS_Store
 *.log
+.classpath
+.project
+.settings/
+.factorypath

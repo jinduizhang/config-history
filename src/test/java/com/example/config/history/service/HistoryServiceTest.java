@@ -219,8 +219,8 @@ class HistoryServiceTest {
 
         // Then
         assertNotNull(result);
-        assertEquals(1, result.getVersion1());
-        assertEquals(2, result.getVersion2());
+        assertEquals(1, result.getSourceVersion());
+        assertEquals(2, result.getTargetVersion());
         assertNotNull(result.getDifferences());
         assertTrue(result.getDifferences().containsKey("theme"));
     }
@@ -325,8 +325,8 @@ class HistoryServiceTest {
 
         // Then
         assertNotNull(result);
-        assertEquals(1, result.getVersion1());
-        assertEquals(1, result.getVersion2());
+        assertEquals(1, result.getSourceVersion());
+        assertEquals(1, result.getTargetVersion());
         assertTrue(result.getDifferences().isEmpty());
     }
 

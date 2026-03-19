@@ -1,4 +1,4 @@
-.opencode/
+# .opencode/  # 保留skills目录，用于共享
 target/
 .idea/
 *.iml
